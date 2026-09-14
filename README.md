@@ -11,6 +11,13 @@ This repo is a thin wrapper. All of Quay's actual behavior lives in
 `v1.1.1`), and `Service.qml` is the one line Omarchy's plugin loader needs
 to start it.
 
+`manifest.json` declares `kinds: ["service"]` with `keepLoaded: true` —
+the same shape as Omarchy's own built-in `background`, `lock` and
+`notifications` plugins. Quay owns its own per-screen `PanelWindow` and
+layer-shell surface, so like those three it doesn't need omarchy-shell to
+summon or position anything; it just needs to be instantiated once and
+stay loaded.
+
 ## Install
 
 ```bash
@@ -42,3 +49,9 @@ over `quay/`, bump `version` in `manifest.json`, and commit.
 ## License
 
 MIT, same as upstream Quay — see [LICENSE](LICENSE).
+
+---
+
+<sub>Maintainer note — marketplace submission: category `Desktop`, tags
+`Launcher`, `Hyprland`, `Quickshell`. `preview.png` is Quay's rail
+screenshot (1024×660).</sub>

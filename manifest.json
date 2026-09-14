@@ -7,5 +7,6 @@
   "license": "MIT",
   "description": "Vertical, home-screen-style app launcher for Omarchy — pinned apps, folders and live window previews in one rail that moves one row per wheel notch.",
   "kinds": ["service"],
+  "keepLoaded": true,
   "entryPoints": { "service": "Service.qml" }
 }
