@@ -32,6 +32,12 @@ edge, reveal mode, icon size, row/column count, and more. Settings are
 Quay's own (`~/.config/quickshell/quay/settings.json`), independent of
 `~/.config/omarchy/shell.json`.
 
+## Uninstall
+
+```bash
+omarchy plugin remove io.github.lunanoir21.quay
+```
+
 ## Requirements
 
 - Hyprland (window previews and fullscreen suppression use Hyprland's
