@@ -14,8 +14,7 @@ to start it.
 ## Install
 
 ```bash
-omarchy plugin add lunanoir21/quay-omarchy
-omarchy plugin enable io.github.lunanoir21.quay
+omarchy plugin add https://github.com/lunanoir21/quay-omarchy.git --enable
 ```
 
 ## Configure
