@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "id": "io.github.lunanoir21.quay",
   "name": "Quay",
-  "version": "1.1.1",
+  "version": "1.1.2",
   "author": "lunanoir21",
   "license": "MIT",
   "description": "Vertical, home-screen-style app launcher for Omarchy — pinned apps, folders and live window previews in one rail that moves one row per wheel notch.",

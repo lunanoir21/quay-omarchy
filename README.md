@@ -8,7 +8,7 @@ wheel notch.
 This repo is a thin wrapper. All of Quay's actual behavior lives in
 [`quickshell-quay`](https://github.com/lunanoir21/quickshell-quay); the
 `quay/` directory here is a vendored, pinned copy of it (currently
-`v1.1.1`), and `Service.qml` is the one line Omarchy's plugin loader needs
+`v1.1.2`), and `Service.qml` is the one line Omarchy's plugin loader needs
 to start it.
 
 `manifest.json` declares `kinds: ["service"]` with `keepLoaded: true` —
