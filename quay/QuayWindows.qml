@@ -12,7 +12,14 @@ Singleton {
     readonly property var toplevels: ToplevelManager.toplevels ? ToplevelManager.toplevels.values : []
     readonly property var activeToplevel: ToplevelManager.activeToplevel
 
-    // appId -> { id, windows: [toplevel], activated: bool }
+    // appId -> { id, windows: [toplevel] }. Which group is active lives apart
+    // from this, in activeGroupId below: folding it in here (as an
+    // "activated" flag written while building the map) made every window
+    // focus change anywhere on the desktop rebuild this whole object — a
+    // fresh `property var` value always looks "changed" to QML regardless of
+    // content, so that alone reran everything downstream (the grid's model,
+    // every tile's icon lookup) on every alt-tab, not just ones that changed
+    // which apps are running.
     readonly property var groups: {
         let out = ({});
         let list = root.toplevels;
@@ -20,17 +27,26 @@ Singleton {
             let toplevel = list[i];
             let id = root.normalize(toplevel.appId);
             if (!id) continue;
-            if (!out[id]) out[id] = { "id": id, "windows": [], "activated": false };
+            if (!out[id]) out[id] = { "id": id, "windows": [] };
             out[id].windows.push(toplevel);
-            if (toplevel === root.activeToplevel) out[id].activated = true;
         }
         return out;
     }
 
     readonly property var runningIds: Object.keys(root.groups)
 
+    readonly property string activeGroupId: root.activeToplevel
+        ? root.normalize(root.activeToplevel.appId) : ""
+
     function normalize(appId) {
         return String(appId || "").toLowerCase();
+    }
+
+    // A window's title is set by whatever app owns it, with no length limit
+    // of its own — bounded here so every preview showing one deals with the
+    // same modest string instead of each display site guessing a limit.
+    function titleFor(toplevel) {
+        return String((toplevel && toplevel.title) || "").slice(0, 300);
     }
 
     // Focus is the usage signal: whatever the compositor hands focus to is what
@@ -61,7 +77,7 @@ Singleton {
 
     function isActive(desktopId) {
         let group = root.groupFor(desktopId);
-        return group ? group.activated : false;
+        return group ? group.id === root.activeGroupId : false;
     }
 
     function windowCount(desktopId) {

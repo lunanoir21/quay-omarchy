@@ -31,9 +31,13 @@ Singleton {
         return null;
     }
 
+    // Falls back to the raw id (a compositor app-id, say) when no desktop
+    // entry matches — that id is as externally controlled as a window title,
+    // so it gets the same length bound before it reaches a Text element.
     function nameFor(id) {
         let entry = root.entryFor(id);
-        return entry ? entry.name : id;
+        if (entry) return entry.name;
+        return String(id || "").slice(0, 200);
     }
 
     // Absolute paths come straight off disk; bare names are resolved against
@@ -145,16 +149,41 @@ Singleton {
         fetcher.running = true;
     }
 
+    // The fetcher script bounds what it reads, but not everything that could
+    // go wrong is on its side of the pipe — a stuck network mount, say. This
+    // is the backstop: kill a scan that runs too long, and refuse to parse
+    // one that somehow still produced more text than a real system would.
+    readonly property int fetchTimeoutMs: 8000
+    readonly property int maxStdoutBytes: 16 * 1024 * 1024
+
+    Timer {
+        id: fetchDeadline
+        interval: root.fetchTimeoutMs
+        onTriggered: {
+            console.warn("Quay: desktop entry scan did not finish in time, stopping it");
+            fetcher.running = false;
+        }
+    }
+
     Process {
         id: fetcher
         running: true
         command: ["python3", QuayStore.moduleDir + "scripts/quay_app_fetcher.py"]
+
+        onRunningChanged: {
+            if (fetcher.running) fetchDeadline.restart();
+            else fetchDeadline.stop();
+        }
 
         stdout: StdioCollector {
             onStreamFinished: {
                 try {
                     let text = String(this.text || "").trim();
                     if (!text) return;
+                    if (text.length > root.maxStdoutBytes) {
+                        console.warn("Quay: desktop entry scan produced too much output, ignoring it");
+                        return;
+                    }
                     root.entries = JSON.parse(text);
                 } catch (e) {
                     console.warn("Quay: could not parse desktop entry index:", e);

@@ -12,7 +12,9 @@ PanelWindow {
 
     required property var quayScreen
     required property int railThickness
-    required property int railLength
+    // Length of the rail surface along the edge; the rail may sit anywhere
+    // inside it, which the tile anchor already accounts for.
+    required property int surfaceLength
     property string entryId: ""
     // Tile centre in the rail surface's coordinates.
     property point anchorPoint: Qt.point(0, 0)
@@ -92,7 +94,7 @@ PanelWindow {
     Rectangle {
         id: card
 
-        readonly property real railStart: ((root.vertical ? root.height : root.width) - root.railLength) / 2
+        readonly property real railStart: ((root.vertical ? root.height : root.width) - root.surfaceLength) / 2
         readonly property real hiddenShift: (root.edge === "right" || root.edge === "bottom" ? 1 : -1) * root.slack
 
         width: root.vertical
@@ -138,6 +140,7 @@ PanelWindow {
             width: card.width - root.pad * 2
             height: root.headerHeight
             text: QuayApps.nameFor(root.shownId)
+            textFormat: Text.PlainText
             color: QuayTheme.subtext0
             font.family: QuayTheme.mono
             font.pixelSize: 10
@@ -197,7 +200,11 @@ PanelWindow {
                             anchors.bottom: parent.bottom
                             anchors.margins: 6
                             anchors.bottomMargin: 3
-                            text: windowCard.modelData.title
+                            text: QuayWindows.titleFor(windowCard.modelData)
+                            // A window title is the owning app's to set, not
+                            // trusted content — plain text keeps a title that
+                            // looks like markup from being rendered as any.
+                            textFormat: Text.PlainText
                             color: windowHover.hovered ? QuayTheme.text : QuayTheme.subtext0
                             font.family: QuayTheme.mono
                             font.pixelSize: 9
